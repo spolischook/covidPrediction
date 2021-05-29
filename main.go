@@ -21,16 +21,12 @@ type CovidStats struct {
 	Date       time.Time
 	NewCases   int
 }
-func main() {
-	csvFile, err := os.Open(statFile)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer csvFile.Close()
-
-	reader := csv.NewReader(csvFile)
-
-	for line, _ := reader.Read(); line != nil; line, _ = reader.Read() {
+type CovidStatsIter struct {
+	*csv.Reader
+	file *os.File
+}
+func (i CovidStatsIter) Next() *CovidStats {
+	for line, _ := i.Read(); line != nil; line, _ = i.Read() {
 		date, err := time.Parse("2006-01-02", line[columnDate])
 		if err != nil { continue }
 		count, err := strconv.Atoi(line[columnNewCases])
@@ -41,6 +37,26 @@ func main() {
 			Date:       date,
 			NewCases:   count,
 		}
+
+		return &stat
+	}
+
+	i.file.Close()
+
+	return nil
+}
+
+func main() {
+	csvFile, err := os.Open(statFile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer csvFile.Close()
+
+	reader := csv.NewReader(csvFile)
+	iter := CovidStatsIter{reader, csvFile}
+
+	for stat := iter.Next(); stat != nil; stat = iter.Next() {
 		fmt.Println(stat.CountryIso + " " + stat.Date.String() + " " + strconv.Itoa(stat.NewCases))
 	}
 }
