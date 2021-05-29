@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	statFile = "/home/spolischook/go/study/covid/owid-covid-data.csv"
 	columnIsoCode = 0
 	columnDate = 3
 	columnNewCases = 5
@@ -21,7 +22,7 @@ type CovidStats struct {
 	NewCases   int
 }
 func main() {
-	csvFile, err := os.Open("/home/spolischook/go/study/covid/owid-covid-data.csv")
+	csvFile, err := os.Open(statFile)
 	if err != nil {
 		log.Fatalln(err)
 	}
