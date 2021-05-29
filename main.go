@@ -16,14 +16,21 @@ func main() {
 	iter := stats.NewIterator(statFile)
 	defer iter.Close()
 
-	country := "UKR"
+	predict(iter, "UKR", "2021-09-01")
+}
+
+func predict(iter *stats.CovidStatsIter, country string, watchingDateStr string) {
 	var startDate *time.Time
 	var x numericalgo.Vector
 	var y numericalgo.Vector
 
 	for stat := iter.Next(); stat != nil; stat = iter.Next() {
-		if country != stat.CountryIso { continue }
-		if startDate == nil { startDate = &stat.Date }
+		if country != stat.CountryIso {
+			continue
+		}
+		if startDate == nil {
+			startDate = &stat.Date
+		}
 
 		day := stat.Date.Sub(*startDate).Hours() / 24
 		x = append(x, day)
@@ -32,8 +39,6 @@ func main() {
 		fmt.Println(stat.CountryIso + " " + strconv.Itoa(int(day)) + " " + strconv.Itoa(stat.NewCases))
 	}
 
-
-	watchingDateStr := "2021-09-01"
 	watchingDate, _ := time.Parse("2006-01-02", watchingDateStr)
 	judgmentDay := watchingDate.Sub(*startDate).Hours() / 24
 	lf := linear.New()
