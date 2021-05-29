@@ -15,7 +15,7 @@ const (
 	columnNewCases = 5
 )
 
-type covidStats struct {
+type CovidStats struct {
 	CountryIso string
 	Date       time.Time
 	NewCases   int
@@ -35,7 +35,7 @@ func main() {
 		count, err := strconv.Atoi(line[columnNewCases])
 		if err != nil { continue }
 
-		stat := covidStats{
+		stat := CovidStats{
 			CountryIso: line[columnIsoCode],
 			Date:       date,
 			NewCases:   count,
